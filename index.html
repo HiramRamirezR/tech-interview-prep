@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Interview Prep | Hiram's Dojo</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">🐍 Tech Interview Prep</div>
+        <div class="progress-summary">
+            Progress: <span id="global-progress">0/30</span>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Sidebar: Exercise List -->
+        <aside class="sidebar">
+            <h3>Exercises</h3>
+            <div id="exercise-list" class="exercise-list">
+                <!-- Populated by JS -->
+            </div>
+        </aside>
+
+        <!-- Main Content: Exercise Detail -->
+        <section class="content-area">
+            <div id="welcome-screen" class="active">
+                <h1>Welcome to the Dojo</h1>
+                <p>Select an exercise from the left to begin.</p>
+                <p>Goal: Solve 30 exercises locally using TDD (Test Driven Development).</p>
+            </div>
+
+            <div id="exercise-detail" class="hidden">
+                <div class="exercise-header">
+                    <span class="badge" id="ex-category">Category</span>
+                    <h2 id="ex-title">Exercise Title</h2>
+                </div>
+
+                <div class="description-box">
+                    <h3>📝 Instructions</h3>
+                    <p id="ex-description">Description here...</p>
+
+                    <h3>💡 Hints</h3>
+                    <ul id="ex-hints"></ul>
+                </div>
+
+                <div class="code-section">
+                    <h3>🧪 Unit Tests (pytest)</h3>
+                    <p>Copy this code into a file named <code>test_solution.py</code> in your local project folder.</p>
+                    <div class="code-block-wrapper">
+                        <button class="copy-btn" onclick="copyToClipboard('test-code')">Copy Tests</button>
+                        <pre><code id="test-code"># Tests will appear here</code></pre>
+                    </div>
+                </div>
+
+                <div class="solution-section">
+                    <h3>✅ Your Final Solution</h3>
+                    <p>Paste your final code here after passing all local tests to save your progress.</p>
+                    <textarea id="user-solution" placeholder="# Paste your solution from main.py here..."></textarea>
+                    <button class="save-btn" onclick="saveSolution()">Save Progress</button>
+                    <span id="save-status" class="status-msg"></span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/app.js"></script>
+</body>
+
+</html>
