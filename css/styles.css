@@ -237,13 +237,11 @@ header {
     margin-bottom: 8px;
 }
 
-.ticket-id {
+.ticket-folder {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    background: #1e1e1e;
-    padding: 2px 8px;
-    border-radius: 3px;
+    font-size: 0.8rem;
+    color: var(--accent);
+    font-weight: 600;
 }
 
 .ticket-type {
@@ -431,32 +429,14 @@ header {
     font-weight: 600;
 }
 
-.ticket-type-badge {
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    padding: 3px 8px;
-    border-radius: 3px;
-}
-
-.ticket-type-badge.review {
-    background: rgba(78, 201, 176, 0.2);
-    color: var(--success);
-}
-
-.ticket-type-badge.new {
-    background: rgba(0, 122, 204, 0.2);
-    color: var(--accent);
-}
-
-.ticket-id-badge {
+.ticket-folder-badge {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem;
-    background: #1e1e1e;
-    border: 1px solid var(--border);
-    padding: 3px 8px;
-    border-radius: 3px;
-    color: var(--text-muted);
+    font-size: 0.75rem;
+    background: rgba(0, 122, 204, 0.15);
+    border: 1px solid var(--accent);
+    padding: 3px 10px;
+    border-radius: 4px;
+    color: var(--accent);
 }
 
 .difficulty {
@@ -882,12 +862,6 @@ textarea:focus {
 
 #library-btn:hover {
     background: rgba(212, 160, 23, 0.1);
-}
-
-/* ===== HIDE TICKET BADGES WHEN NOT ACTIVE ===== */
-.ticket-type-badge.hidden-badge,
-.ticket-id-badge.hidden-badge {
-    display: none !important;
 }
 
 /* ===== RESET BUTTON ===== */

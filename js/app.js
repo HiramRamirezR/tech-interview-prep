@@ -334,11 +334,8 @@ function _enterExercise(ex, opts) {
   document.getElementById('ex-description').textContent = opts.desc;
   document.getElementById('ex-context-label').textContent = returnToLibrary ? 'Description' : 'Ticket Context';
 
-  const showTicket = opts.showTicket && opts.ticketId;
-  document.getElementById('ex-ticket-id').textContent = showTicket ? opts.ticketId : '';
-  document.getElementById('ex-ticket-id').className = 'ticket-id-badge' + (showTicket ? '' : ' hidden-badge');
-  document.getElementById('ex-ticket-type').textContent = showTicket ? (opts.ticketType === 'review' ? 'Review' : 'New') : '';
-  document.getElementById('ex-ticket-type').className = 'ticket-type-badge ' + (opts.ticketType || '') + (showTicket ? '' : ' hidden-badge');
+  const folderName = 'ex-' + String(ex.id).padStart(2, '0') + '-' + ex.pattern;
+  document.getElementById('ex-folder-name').textContent = folderName;
 
   const stars = '\u2605'.repeat(ex.difficulty) + '\u2606'.repeat(3 - ex.difficulty);
   document.getElementById('ex-difficulty').textContent = LEVEL_CONFIG[ex.level].icon + ' ' + stars;

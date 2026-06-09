@@ -50,21 +50,21 @@ const Dashboard = {
 
   _renderTicket(ticket, container) {
     const done = AppState.isTicketCompleted(ticket.ticketId);
+    const folderName = 'ex-' + String(ticket.exerciseId).padStart(2, '0') + '-' + ticket.pattern;
     const card = document.createElement('div');
     card.className = 'ticket-card' + (done ? ' completed' : '');
     card.innerHTML = `
       <div class="ticket-header">
-        <span class="ticket-id">${ticket.ticketId}</span>
-        <span class="ticket-type ${ticket.type}">${ticket.type === 'review' ? '\u{1F501} Review' : '\u{1F195} New'}</span>
+        <span class="ticket-folder">${folderName}</span>
         <span class="ticket-estimate">~${ticket.estimateMinutes} min</span>
       </div>
       <h3 class="ticket-title">${ticket.title}</h3>
       <p class="ticket-context">${ticket.context}</p>
       <div class="ticket-meta">
-        <span class="pattern-badge">${ticket.pattern}</span>
+        <span class="ticket-type ${ticket.type}">${ticket.type === 'review' ? '\u{1F501} Review' : '\u{1F195} New'}</span>
         <span class="ticket-status ${done ? 'done' : 'pending'}">${done ? 'Done' : 'Pending'}</span>
       </div>
-      <button class="start-ticket-btn" data-ticket-id="${ticket.ticketId}" ${done ? 'disabled' : ''}>
+      <button class="start-ticket-btn" data-ticket-id="${ticket.ticketId}" data-ex-id="${ticket.exerciseId}" ${done ? 'disabled' : ''}>
         ${done ? 'Completed' : 'Start Ticket \u2192'}
       </button>
     `;
