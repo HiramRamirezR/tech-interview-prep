@@ -1,187 +1,263 @@
-const exercises = [
-    {
-        id: 1,
-        category: "Fundamentals",
-        title: "Advanced String Manipulation",
-        description: "Create a function called 'camel_to_snake' that receives a camelCase string (e.g., 'myVariableExample') and converts it to snake_case (e.g., 'my_variable_example').",
-        hints: [
-            "You can use regular expressions (re module) to detect uppercase letters.",
-            "Remember to convert the entire final result to lowercase."
-        ],
-        testCode: `import pytest
-from solution import camel_to_snake
+// ===== State =====
+let currentTicket = null;
+let timerInterval = null;
+let timerSeconds = 0;
+let whiteboardActive = false;
+let hintsRevealed = 0;
+let modelSolutionVisible = false;
 
-def test_basic_conversion():
-    assert camel_to_snake("camelCase") == "camel_case"
+const LEVEL_CONFIG = {
+  entry: { label: 'Entry', icon: '\u2B50', class: 'level-entry', next: 'junior' },
+  junior: { label: 'Junior', icon: '\u2B50\u2B50', class: 'level-junior', next: 'mid' },
+  mid: { label: 'Mid', icon: '\u2B50\u2B50\u2B50', class: 'level-mid', next: null }
+};
 
-def test_multiple_words():
-    assert camel_to_snake("thisIsATestString") == "this_is_a_test_string"
-
-def test_single_word():
-    assert camel_to_snake("hello") == "hello"`
-    },
-    {
-        id: 2,
-        category: "Fundamentals",
-        title: "Conditional List Comprehensions",
-        description: "Write a function 'filter_and_square' that receives a list of integers. It should return a new list with the squares of numbers that are divisible by 3 but not by 2.",
-        hints: [
-            "Use a list comprehension with multiple conditions.",
-            "Order: [expression for item in list if condition1 if condition2]"
-        ],
-        testCode: `from solution import filter_and_square
-
-def test_basic_filtering():
-    input_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    # 3 and 9 are odd and divisible by 3. Squares: 9, 81
-    assert filter_and_square(input_list) == [9, 81]
-
-def test_empty_result():
-    assert filter_and_square([2, 4, 8]) == []
-
-def test_negative_numbers():
-    assert filter_and_square([-3, -6, 9]) == [9, 81]`
-    },
-    {
-        id: 3,
-        category: "Fundamentals",
-        title: "Dictionaries & Frequency Counting",
-        description: "Create a function 'word_frequency' that takes a text string and returns a dictionary where keys are words (lowercase) and values are their occurrence count.",
-        hints: [
-            "Use split() to get the words.",
-            "You can use a simple for loop or collections.Counter."
-        ],
-        testCode: `from solution import word_frequency
-
-def test_basic_count():
-    text = "the cat and the dog"
-    result = word_frequency(text)
-    assert result["the"] == 2
-    assert result["cat"] == 1
-
-def test_case_insensitive():
-    text = "Python python PYTHON"
-    assert word_frequency(text)["python"] == 3
-
-def test_punctuation_handling():
-    text = "hello world hello"
-    assert word_frequency(text)["hello"] == 2`
-    },
-    {
-        id: 4,
-        category: "Fundamentals",
-        title: "Custom Error Handling",
-        description: "Create a function 'divide_numbers' that takes two parameters. It must raise a custom 'DivisionByZeroError' if the divisor is 0, and 'InvalidTypeError' if either parameter is not a number (int or float).",
-        hints: [
-            "Define your exception classes inheriting from Exception.",
-            "Use isinstance() to check data types."
-        ],
-        testCode: `import pytest
-from solution import divide_numbers, DivisionByZeroError, InvalidTypeError
-
-def test_valid_division():
-    assert divide_numbers(10, 2) == 5.0
-
-def test_zero_division():
-    with pytest.raises(DivisionByZeroError):
-        divide_numbers(10, 0)
-
-def test_invalid_type():
-    with pytest.raises(InvalidTypeError):
-        divide_numbers("10", 2)`
-    },
-    {
-        id: 5,
-        category: "Fundamentals",
-        title: "Generators & Iterators",
-        description: "Implement a generator called 'fibonacci_gen' that produces an infinite Fibonacci sequence. Then, create a function 'get_first_n_fib' that uses that generator to return a list with the first N numbers.",
-        hints: [
-            "Use the yield keyword in the generator.",
-            "Remember that generators maintain their state between calls."
-        ],
-        testCode: `from solution import get_first_n_fib
-
-def test_first_5_fib():
-    assert get_first_n_fib(5) == [0, 1, 1, 2, 3]
-
-def test_first_1_fib():
-    assert get_first_n_fib(1) == [0]
-
-def test_first_7_fib():
-    assert get_first_n_fib(7) == [0, 1, 1, 2, 3, 5, 8]`
-    }
-];
-
-// --- APP LOGIC ---
-let currentExerciseId = null;
-
+// ===== Init =====
 document.addEventListener('DOMContentLoaded', () => {
-    renderExerciseList();
-    loadProgress();
+  showDashboard();
+  updateGlobalProgress();
+  document.getElementById('save-btn').addEventListener('click', saveSolution);
+  document.getElementById('copy-btn').addEventListener('click', copyTests);
+  document.getElementById('whiteboard-toggle').addEventListener('click', toggleWhiteboard);
+  document.getElementById('timer-toggle').addEventListener('click', toggleTimer);
+  document.getElementById('reveal-hint-btn').addEventListener('click', revealNextHint);
+  document.getElementById('back-to-dashboard').addEventListener('click', showDashboard);
+  document.getElementById('show-reference-btn').addEventListener('click', toggleModelSolution);
+  document.getElementById('tickets-container').addEventListener('click', (e) => {
+    const btn = e.target.closest('.start-ticket-btn');
+    if (!btn) return;
+    const ticketId = btn.dataset.ticketId;
+    const tickets = AppState.getTicketsForToday();
+    const ticket = tickets ? tickets.find(t => t.ticketId === ticketId) : null;
+    if (ticket) showExercise(ticket);
+  });
 });
 
-function renderExerciseList() {
-    const listContainer = document.getElementById('exercise-list');
-    listContainer.innerHTML = '';
-    exercises.forEach(ex => {
-        const div = document.createElement('div');
-        div.className = 'exercise-item';
-        div.textContent = `${ex.id}. ${ex.title}`;
-        div.onclick = () => loadExercise(ex.id);
-        if (localStorage.getItem(`ex_${ex.id}_completed`) === 'true') {
-            div.classList.add('completed');
-        }
-        listContainer.appendChild(div);
-    });
+// ===== Navigation =====
+function showDashboard() {
+  stopTimer();
+  whiteboardActive = false;
+  hintsRevealed = 0;
+  currentTicket = null;
+  document.getElementById('welcome-screen').classList.add('hidden');
+  document.getElementById('exercise-detail').classList.add('hidden');
+  document.getElementById('dashboard').classList.remove('hidden');
+  Dashboard.render();
+  document.getElementById('exercise-detail').classList.remove('whiteboard');
+  document.getElementById('whiteboard-toggle').classList.remove('active');
+  document.getElementById('whiteboard-toggle').textContent = 'Whiteboard Mode';
 }
 
-function loadExercise(id) {
-    currentExerciseId = id;
-    const ex = exercises.find(e => e.id === id);
-    document.getElementById('welcome-screen').classList.add('hidden');
-    document.getElementById('exercise-detail').classList.remove('hidden');
-    document.getElementById('ex-category').textContent = ex.category;
-    document.getElementById('ex-title').textContent = ex.title;
-    document.getElementById('ex-description').textContent = ex.description;
-    document.getElementById('test-code').textContent = ex.testCode;
+function showExercise(ticket) {
+  currentTicket = ticket;
+  const ex = exercises.find(e => e.id === ticket.exerciseId);
+  if (!ex) return;
+  stopTimer();
+  whiteboardActive = false;
+  hintsRevealed = 0;
+  modelSolutionVisible = false;
+  document.getElementById('dashboard').classList.add('hidden');
+  document.getElementById('exercise-detail').classList.remove('hidden');
+  document.getElementById('exercise-detail').classList.remove('whiteboard');
+  document.getElementById('whiteboard-toggle').textContent = 'Whiteboard Mode';
+  document.getElementById('whiteboard-toggle').classList.remove('active');
 
-    const hintsList = document.getElementById('ex-hints');
-    hintsList.innerHTML = '';
-    ex.hints.forEach(hint => {
-        const li = document.createElement('li');
-        li.textContent = hint;
-        hintsList.appendChild(li);
-    });
+  document.getElementById('ex-category').textContent = ex.category;
+  document.getElementById('ex-title').textContent = ticket.title;
+  document.getElementById('ex-ticket-id').textContent = ticket.ticketId;
+  document.getElementById('ex-ticket-type').textContent = ticket.type === 'review' ? 'Review' : 'New';
+  document.getElementById('ex-ticket-type').className = 'ticket-type-badge ' + ticket.type;
+  document.getElementById('ex-description').textContent = ticket.context;
 
-    const savedSolution = localStorage.getItem(`ex_${currentExerciseId}_solution`) || '';
-    document.getElementById('user-solution').value = savedSolution;
+  const stars = '\u2605'.repeat(ex.difficulty) + '\u2606'.repeat(3 - ex.difficulty);
+  document.getElementById('ex-difficulty').textContent = LEVEL_CONFIG[ex.level].icon + ' ' + stars;
+  document.getElementById('ex-difficulty').className = 'difficulty ' + LEVEL_CONFIG[ex.level].class;
+
+  document.getElementById('test-code').textContent = ex.testCode;
+
+  const saved = AppState.getSolution(ex.id);
+  document.getElementById('user-solution').value = saved;
+  document.getElementById('save-status').textContent = '';
+
+  document.getElementById('model-solution-section').classList.add('hidden');
+  document.getElementById('model-solution-content').textContent = ex.modelSolution;
+  document.getElementById('show-reference-btn').classList.add('hidden');
+
+  renderHints(ex.hints);
+  resetTimerDisplay();
+  document.getElementById('timer-toggle').textContent = 'Start Timer (' + ticket.estimateMinutes + ' min)';
+  document.getElementById('timer-toggle').classList.remove('active');
+  document.getElementById('timer-display').style.display = 'none';
 }
 
-function copyToClipboard(elementId) {
-    const text = document.getElementById(elementId).textContent;
-    navigator.clipboard.writeText(text).then(() => {
-        alert('Tests copied! Create a test_solution.py file in your local folder.');
-    });
+// ===== Hints =====
+function renderHints(hints) {
+  const list = document.getElementById('ex-hints');
+  list.innerHTML = '';
+  hintsRevealed = 0;
+  if (hints.length === 0) {
+    document.getElementById('reveal-hint-btn').style.display = 'none';
+    return;
+  }
+  const first = document.createElement('li');
+  first.textContent = '\u{1F4A1} ' + hints[0];
+  list.appendChild(first);
+  hintsRevealed = 1;
+  document.getElementById('reveal-hint-btn').style.display = hintsRevealed < hints.length ? 'inline-block' : 'none';
 }
 
+function revealNextHint() {
+  if (!currentTicket) return;
+  const ex = exercises.find(e => e.id === currentTicket.exerciseId);
+  if (!ex || hintsRevealed >= ex.hints.length) return;
+  const list = document.getElementById('ex-hints');
+  const li = document.createElement('li');
+  li.textContent = '\u{1F4A1} ' + ex.hints[hintsRevealed];
+  list.appendChild(li);
+  hintsRevealed++;
+  document.getElementById('reveal-hint-btn').style.display = hintsRevealed < ex.hints.length ? 'inline-block' : 'none';
+}
+
+// ===== Whiteboard =====
+function toggleWhiteboard() {
+  whiteboardActive = !whiteboardActive;
+  const detail = document.getElementById('exercise-detail');
+  const btn = document.getElementById('whiteboard-toggle');
+  if (whiteboardActive) {
+    detail.classList.add('whiteboard');
+    btn.textContent = 'Exit Whiteboard';
+    btn.classList.add('active');
+  } else {
+    detail.classList.remove('whiteboard');
+    btn.textContent = 'Whiteboard Mode';
+    btn.classList.remove('active');
+  }
+}
+
+// ===== Timer =====
+function toggleTimer() {
+  if (timerInterval) { stopTimer(); return; }
+  if (!currentTicket) return;
+  timerSeconds = currentTicket.estimateMinutes * 60;
+  document.getElementById('timer-display').style.display = 'block';
+  document.getElementById('timer-toggle').textContent = 'Stop Timer';
+  document.getElementById('timer-toggle').classList.add('active');
+  document.getElementById('ex-hints').style.display = 'none';
+  document.getElementById('reveal-hint-btn').style.display = 'none';
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    timerSeconds--;
+    updateTimerDisplay();
+    if (timerSeconds <= 0) {
+      stopTimer();
+      document.getElementById('timer-display').classList.add('expired');
+      document.getElementById('save-status').textContent = "Time's up! Save what you have.";
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  document.getElementById('ex-hints').style.display = '';
+  if (currentTicket) {
+    const ex = exercises.find(e => e.id === currentTicket.exerciseId);
+    if (ex && hintsRevealed < ex.hints.length) {
+      document.getElementById('reveal-hint-btn').style.display = 'inline-block';
+    }
+  }
+  document.getElementById('timer-toggle').textContent = 'Start Timer';
+  document.getElementById('timer-toggle').classList.remove('active');
+  document.getElementById('timer-display').classList.remove('expired');
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerSeconds / 60);
+  const s = timerSeconds % 60;
+  document.getElementById('timer-countdown').textContent =
+    String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+}
+
+function resetTimerDisplay() {
+  stopTimer();
+  document.getElementById('timer-display').style.display = 'none';
+  document.getElementById('timer-display').classList.remove('expired');
+}
+
+// ===== Copy =====
+function copyTests() {
+  const text = document.getElementById('test-code').textContent;
+  const done = () => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy Tests'; }, 1500);
+  };
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(done);
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    done();
+  }
+}
+
+// ===== Save =====
 function saveSolution() {
-    if (!currentExerciseId) return;
-    const code = document.getElementById('user-solution').value;
-    localStorage.setItem(`ex_${currentExerciseId}_solution`, code);
-    localStorage.setItem(`ex_${currentExerciseId}_completed`, 'true');
-    document.getElementById('save-status').textContent = 'Progress Saved! ✅';
-    setTimeout(() => document.getElementById('save-status').textContent = '', 2000);
-    renderExerciseList();
-    updateGlobalProgress();
+  if (!currentTicket) return;
+  const ex = exercises.find(e => e.id === currentTicket.exerciseId);
+  if (!ex) return;
+  const code = document.getElementById('user-solution').value.trim();
+  if (!code) {
+    document.getElementById('save-status').textContent = 'Write a solution first!';
+    return;
+  }
+  const isNewCompletion = !AppState.isCompleted(ex.id);
+  AppState.saveSolution(ex.id, code);
+  AppState.markCompleted(ex.id);
+  AppState.markTicketCompleted(currentTicket.ticketId);
+  if (isNewCompletion) {
+    AppState.addToHistory({
+      date: AppState.getTodayStr(),
+      exerciseId: ex.id,
+      pattern: ex.pattern,
+      ticketId: currentTicket.ticketId
+    });
+  }
+  const tickets = AppState.getTicketsForToday();
+  const allDone = tickets && tickets.every(t => AppState.isTicketCompleted(t.ticketId));
+  if (allDone) {
+    AppState.setStreak(AppState.getStreak() + 1);
+  }
+
+  document.getElementById('save-status').textContent = 'Saved! \u2705';
+  document.getElementById('model-solution-content').textContent = ex.modelSolution;
+  document.getElementById('show-reference-btn').classList.remove('hidden');
+  document.getElementById('model-solution-section').classList.add('hidden');
+  modelSolutionVisible = false;
+  updateGlobalProgress();
 }
 
-function loadProgress() {
-    updateGlobalProgress();
+// ===== Model Solution Toggle =====
+function toggleModelSolution() {
+  modelSolutionVisible = !modelSolutionVisible;
+  const section = document.getElementById('model-solution-section');
+  const btn = document.getElementById('show-reference-btn');
+  if (modelSolutionVisible) {
+    section.classList.remove('hidden');
+    btn.textContent = 'Hide Reference';
+  } else {
+    section.classList.add('hidden');
+    btn.textContent = 'Show Reference Solution';
+  }
 }
 
+// ===== Progress =====
 function updateGlobalProgress() {
-    const completed = exercises.filter(ex =>
-        localStorage.getItem(`ex_${ex.id}_completed`) === 'true'
-    ).length;
-    document.getElementById('global-progress').textContent = `${completed}/${exercises.length}`;
+  document.getElementById('global-progress').textContent =
+    AppState.getCompletedCount() + '/' + exercises.length;
 }
