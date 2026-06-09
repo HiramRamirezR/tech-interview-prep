@@ -34,7 +34,7 @@ const Scheduler = {
     return 'crisis';
   },
 
-  _pickReview() {
+  _pickReview(excludeIds) {
     const history = AppState.getHistory();
     if (history.length === 0) return null;
     const today = new Date();
@@ -42,6 +42,7 @@ const Scheduler = {
     const seen = new Set();
     for (const entry of history) {
       if (seen.has(entry.exerciseId)) continue;
+      if (excludeIds && excludeIds.includes(entry.exerciseId)) continue;
       const entryDate = new Date(entry.date);
       const workDays = this._workDaysBetween(entryDate, today);
       if (workDays === 1 || workDays === 3 || workDays === 7) {
@@ -103,14 +104,21 @@ const Scheduler = {
       if (missed > 0) AppState.setStreak(0);
     }
     const tickets = [];
-    const review = this._pickReview();
-    if (review) tickets.push(review);
-    const firstNew = this._pickNew(tickets.map(t => t.exerciseId));
-    if (firstNew) tickets.push(firstNew);
-    if (tickets.length === 1) {
-      const secondNew = this._pickNew(tickets.map(t => t.exerciseId));
-      if (secondNew) tickets.push(secondNew);
+    const usedExerciseIds = [];
+
+    while (tickets.length < 5) {
+      const review = this._pickReview(usedExerciseIds);
+      if (review) {
+        tickets.push(review);
+        usedExerciseIds.push(review.exerciseId);
+        continue;
+      }
+      const nextNew = this._pickNew(usedExerciseIds);
+      if (!nextNew) break;
+      tickets.push(nextNew);
+      usedExerciseIds.push(nextNew.exerciseId);
     }
+
     return tickets;
   },
 

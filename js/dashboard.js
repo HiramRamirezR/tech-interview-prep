@@ -44,6 +44,8 @@ const Dashboard = {
     }
 
     this._renderPatternProgress(document.getElementById('pattern-progress'));
+    this._renderStats(document.getElementById('stats-container'));
+    this._renderWeeklyStats(document.getElementById('weekly-stats'));
   },
 
   _renderTicket(ticket, container) {
@@ -93,5 +95,67 @@ const Dashboard = {
       `;
       container.appendChild(bar);
     });
+  },
+
+  _renderStats(container) {
+    const total = exercises.length;
+    const done = AppState.getCompletedCount();
+    const streak = AppState.getStreak();
+    const longest = AppState.getLongestStreak();
+
+    const levelEntries = ['entry', 'junior', 'mid'];
+    const levelLabels = { entry: 'Entry', junior: 'Junior', mid: 'Mid' };
+    const levelRows = levelEntries.map(l => {
+      const t = exercises.filter(ex => ex.level === l).length;
+      const d = exercises.filter(ex => ex.level === l && AppState.isCompleted(ex.id)).length;
+      return `<div class="stat-row"><span class="stat-label">${levelLabels[l]}</span><span class="stat-value">${d}/${t}</span></div>`;
+    }).join('');
+
+    const patternCounts = {};
+    exercises.forEach(ex => {
+      if (AppState.isCompleted(ex.id)) {
+        const g = ex.patternGroup;
+        patternCounts[g] = (patternCounts[g] || 0) + 1;
+      }
+    });
+    let topPattern = '—';
+    let topCount = 0;
+    Object.entries(patternCounts).forEach(([name, c]) => {
+      if (c > topCount) { topPattern = name; topCount = c; }
+    });
+
+    container.innerHTML = `
+      <div class="stat-row"><span class="stat-label">Completed</span><span class="stat-value highlight">${done}/${total}</span></div>
+      ${levelRows}
+      <div class="stat-row"><span class="stat-label">Streak</span><span class="stat-value">${streak}${streak === longest && streak > 0 ? ' &#x1F525;' : ''}</span></div>
+      <div class="stat-row"><span class="stat-label">Longest Streak</span><span class="stat-value">${longest}</span></div>
+      <div class="stat-row"><span class="stat-label">Top Pattern</span><span class="stat-value">${topPattern}${topCount > 0 ? ' (' + topCount + ')' : ''}</span></div>
+    `;
+  },
+
+  _renderWeeklyStats(container) {
+    const history = AppState.getHistory();
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    const weekStr = weekAgo.toISOString().split('T')[0];
+    const weekEntries = history.filter(h => h.date >= weekStr);
+
+    if (weekEntries.length === 0) {
+      container.innerHTML = '<div class="weekly-empty">No exercises this week yet.</div>';
+      return;
+    }
+
+    const patCounts = {};
+    weekEntries.forEach(h => {
+      patCounts[h.pattern] = (patCounts[h.pattern] || 0) + 1;
+    });
+
+    const sorted = Object.entries(patCounts).sort((a, b) => b[1] - a[1]);
+    container.innerHTML = sorted.map(([pat, count]) => `
+      <div class="weekly-pattern">
+        <span class="weekly-pat-name">${pat}</span>
+        <span class="weekly-pat-count">${count}</span>
+      </div>
+    `).join('');
   }
 };

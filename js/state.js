@@ -94,6 +94,9 @@ const AppState = {
 
   setStreak(n) {
     localStorage.setItem(this._key('streak'), String(n));
+    if (n > this.getLongestStreak()) {
+      this.setLongestStreak(n);
+    }
   },
 
   getLastWorkDay() {
@@ -112,6 +115,14 @@ const AppState = {
     localStorage.setItem(this._key('status'), s);
   },
 
+  getLongestStreak() {
+    return parseInt(localStorage.getItem(this._key('longest_streak')) || '0');
+  },
+
+  setLongestStreak(n) {
+    localStorage.setItem(this._key('longest_streak'), String(n));
+  },
+
   // === Avatar ===
   getAvatar() {
     const count = this.getCompletedCount();
@@ -120,6 +131,19 @@ const AppState = {
     if (count < 15) return { emoji: '\u{1F414}', title: 'Senior Dev', level: 3 };
     if (count < 20) return { emoji: '\u{1F985}', title: 'Team Lead', level: 4 };
     return { emoji: '\u{1F409}', title: 'Architect', level: 5 };
+  },
+
+  resetAll() {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith(this._prefix));
+    keys.forEach(k => localStorage.removeItem(k));
+  },
+
+  isLevelUnlocked(level) {
+    if (level === 'entry') return true;
+    const prevLevel = level === 'junior' ? 'entry' : 'junior';
+    const prevTotal = exercises.filter(ex => ex.level === prevLevel).length;
+    const prevDone = exercises.filter(ex => ex.level === prevLevel && this.isCompleted(ex.id)).length;
+    return prevDone >= prevTotal;
   },
 
   getDayCount() {
