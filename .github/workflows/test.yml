@@ -5,8 +5,40 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: pip install pytest
-      - run: pytest practice-python/ -v --tb=short
+      - name: Test only changed solutions
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            before="${{ github.event.before }}"
+          else
+            before="${{ github.event.pull_request.base.sha }}"
+          fi
+
+          if [ "$before" = "0000000000000000000000000000000000000000" ]; then
+            echo "First commit — testing all exercises with real solutions"
+            dirs=""
+            for d in practice-python/ex-*/; do
+              sol="$d/solution.py"
+              if [ -f "$sol" ] && [ "$(wc -c < "$sol")" -gt 25 ]; then
+                dirs="$dirs $d"
+              fi
+            done
+          else
+            changed=$(git diff --name-only "$before" HEAD -- 'practice-python/*/solution.py')
+            if [ -z "$changed" ]; then
+              echo "No solution files changed. Skipping tests."
+              exit 0
+            fi
+            dirs=""
+            for f in $changed; do dirs="$dirs $(dirname "$f")"; done
+          fi
+
+          echo "Testing: $dirs"
+          # Deduplicate
+          dirs=$(echo "$dirs" | tr ' ' '\n' | sort -u | tr '\n' ' ')
+          pytest $dirs -v --tb=short

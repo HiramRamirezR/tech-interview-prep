@@ -5,8 +5,6 @@ let timerInterval = null;
 let timerSeconds = 0;
 let whiteboardActive = false;
 let hintsRevealed = 0;
-let modelSolutionVisible = false;
-
 const COMPLEXITY = {
   1: { time: "O(n)", space: "O(n)" },
   2: { time: "O(n)", space: "O(n)" },
@@ -147,8 +145,6 @@ const LEVEL_CONFIG = {
 document.addEventListener('DOMContentLoaded', () => {
   showDashboard();
   updateGlobalProgress();
-  document.getElementById('save-btn').addEventListener('click', saveSolution);
-  document.getElementById('copy-btn').addEventListener('click', copyTests);
   document.getElementById('whiteboard-toggle').addEventListener('click', toggleWhiteboard);
   document.getElementById('timer-toggle').addEventListener('click', toggleTimer);
   document.getElementById('reveal-hint-btn').addEventListener('click', revealNextHint);
@@ -157,7 +153,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('library-btn').addEventListener('click', showLibrary);
   document.getElementById('back-to-dashboard-from-lib').addEventListener('click', showDashboard);
-  document.getElementById('show-reference-btn').addEventListener('click', toggleModelSolution);
+  document.getElementById('show-reference-btn').addEventListener('click', revealReference);
+  document.getElementById('mark-done-btn').addEventListener('click', markDone);
 
   document.getElementById('reset-btn').addEventListener('click', () => {
     if (confirm('Reset all progress? This cannot be undone.')) {
@@ -319,7 +316,6 @@ function _enterExercise(ex, opts) {
   stopTimer();
   whiteboardActive = false;
   hintsRevealed = 0;
-  modelSolutionVisible = false;
   document.getElementById('dashboard').classList.add('hidden');
   document.getElementById('library').classList.add('hidden');
   document.getElementById('exercise-detail').classList.remove('hidden');
@@ -341,24 +337,29 @@ function _enterExercise(ex, opts) {
   document.getElementById('ex-difficulty').textContent = LEVEL_CONFIG[ex.level].icon + ' ' + stars;
   document.getElementById('ex-difficulty').className = 'difficulty ' + LEVEL_CONFIG[ex.level].class;
 
-  document.getElementById('test-code').textContent = ex.testCode;
-
   const saved = AppState.getSolution(ex.id);
   document.getElementById('user-solution').value = saved;
   document.getElementById('save-status').textContent = '';
-
-  const cx = COMPLEXITY[ex.id];
-  if (cx && saved) {
-    const badge = document.getElementById('complexity-badge');
-    badge.textContent = 'Time: ' + cx.time + ' \u00B7 Space: ' + cx.space;
-    badge.className = 'complexity-badge';
-  } else {
-    document.getElementById('complexity-badge').className = 'complexity-badge hidden';
+  document.getElementById('compare-section').classList.add('hidden');
+  document.getElementById('show-reference-btn').className = 'ref-btn';
+  document.getElementById('show-reference-btn').textContent = '\u2705 Done \u2014 show reference solution';
+  document.getElementById('complexity-badge').className = 'complexity-badge hidden';
+  document.getElementById('chk-pytest').checked = false;
+  document.getElementById('chk-push').checked = false;
+  document.getElementById('chk-pass').checked = false;
+  const completed = AppState.isCompleted(ex.id);
+  if (completed) {
+    document.getElementById('show-reference-btn').textContent = '\u2705 View reference solution';
+    document.getElementById('compare-section').classList.remove('hidden');
+    document.getElementById('mark-done-btn').textContent = 'Completed \u2705';
+    document.getElementById('mark-done-btn').disabled = true;
+    const cx = COMPLEXITY[ex.id];
+    if (cx) {
+      document.getElementById('complexity-badge').textContent = 'Complexity: ' + cx.time + ' \u00B7 ' + cx.space;
+      document.getElementById('complexity-badge').className = 'complexity-badge';
+    }
   }
-
-  document.getElementById('model-solution-section').classList.add('hidden');
   document.getElementById('model-solution-content').textContent = ex.modelSolution;
-  document.getElementById('show-reference-btn').classList.add('hidden');
 
   renderHints(ex.hints);
   renderEdgeCases(ex.patternGroup);
@@ -474,41 +475,34 @@ function resetTimerDisplay() {
   document.getElementById('timer-display').classList.remove('expired');
 }
 
-// ===== Copy =====
-function copyTests() {
-  const text = document.getElementById('test-code').textContent;
-  const done = () => {
-    const btn = document.getElementById('copy-btn');
-    btn.textContent = 'Copied!';
-    setTimeout(() => { btn.textContent = 'Copy Tests'; }, 1500);
-  };
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(done);
-  } else {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.left = '-9999px';
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    done();
+// ===== Reveal Reference =====
+function revealReference() {
+  const ex = exercises.find(e => e.id === currentTicket.exerciseId);
+  if (!ex) return;
+  document.getElementById('show-reference-btn').className = 'ref-btn hidden';
+  document.getElementById('compare-section').classList.remove('hidden');
+
+  const cx = COMPLEXITY[ex.id];
+  if (cx) {
+    const badge = document.getElementById('complexity-badge');
+    badge.textContent = 'Complexity: ' + cx.time + ' \u00B7 ' + cx.space;
+    badge.className = 'complexity-badge';
   }
+
+  document.getElementById('mark-done-btn').textContent = 'Mark as completed \u2714';
+  document.getElementById('mark-done-btn').disabled = false;
 }
 
-// ===== Save =====
-function saveSolution() {
+// ===== Mark Done =====
+function markDone() {
   if (!currentTicket) return;
   const ex = exercises.find(e => e.id === currentTicket.exerciseId);
   if (!ex) return;
   const code = document.getElementById('user-solution').value.trim();
-  if (!code) {
-    document.getElementById('save-status').textContent = 'Write a solution first!';
-    return;
+  if (code) {
+    AppState.saveSolution(ex.id, code);
   }
   const isNewCompletion = !AppState.isCompleted(ex.id);
-  AppState.saveSolution(ex.id, code);
   AppState.markCompleted(ex.id);
   AppState.markTicketCompleted(currentTicket.ticketId);
   if (isNewCompletion) {
@@ -525,34 +519,10 @@ function saveSolution() {
     AppState.setStreak(AppState.getStreak() + 1);
   }
 
-  document.getElementById('save-status').textContent = 'Saved! \u2705';
-  document.getElementById('model-solution-content').textContent = ex.modelSolution;
-  document.getElementById('show-reference-btn').classList.remove('hidden');
-  document.getElementById('model-solution-section').classList.add('hidden');
-  modelSolutionVisible = false;
-
-  const cx = COMPLEXITY[ex.id];
-  if (cx) {
-    const badge = document.getElementById('complexity-badge');
-    badge.textContent = 'Time: ' + cx.time + ' \u00B7 Space: ' + cx.space;
-    badge.className = 'complexity-badge';
-  }
-
+  document.getElementById('save-status').textContent = 'Completed \u2705';
+  document.getElementById('mark-done-btn').textContent = 'Completado \u2705';
+  document.getElementById('mark-done-btn').disabled = true;
   updateGlobalProgress();
-}
-
-// ===== Model Solution Toggle =====
-function toggleModelSolution() {
-  modelSolutionVisible = !modelSolutionVisible;
-  const section = document.getElementById('model-solution-section');
-  const btn = document.getElementById('show-reference-btn');
-  if (modelSolutionVisible) {
-    section.classList.remove('hidden');
-    btn.textContent = 'Hide Reference';
-  } else {
-    section.classList.add('hidden');
-    btn.textContent = 'Show Reference Solution';
-  }
 }
 
 // ===== Progress =====

@@ -116,29 +116,38 @@
                 <ul id="ex-edge-cases"></ul>
             </div>
 
-            <div class="code-section" id="test-code-section">
-                <h3>Unit Tests (pytest)</h3>
-                <p>Copy this code into <code>test_solution.py</code>, then run <code>python -m pytest</code> to test your solution.</p>
-                <div class="code-block-wrapper">
-                    <button id="copy-btn" class="copy-btn">Copy Tests</button>
-                    <pre><code id="test-code"># Tests will appear here</code></pre>
-                </div>
-            </div>
-
             <div class="solution-section">
-                <h3>Your Solution</h3>
-                <textarea id="user-solution" placeholder="Write your Python solution here..."></textarea>
-                <div class="save-row">
-                    <button id="save-btn" class="save-btn">Save Progress</button>
-                    <span id="save-status" class="status-msg"></span>
-                    <span id="complexity-badge" class="complexity-badge hidden"></span>
-                    <button id="show-reference-btn" class="ref-btn hidden">Show Reference Solution</button>
-                </div>
-            </div>
+                <button id="show-reference-btn" class="ref-btn">&#x2705; Done &mdash; show reference solution</button>
 
-            <div id="model-solution-section" class="model-solution hidden">
-                <h3>Reference Solution</h3>
-                <pre><code id="model-solution-content"></code></pre>
+                <div id="compare-section" class="hidden">
+                    <div class="compare-panels">
+                        <div class="compare-col">
+                            <h3>Your code</h3>
+                            <textarea id="user-solution" placeholder="Paste your solution.py here to compare..."></textarea>
+                        </div>
+                        <div class="compare-col">
+                            <h3>Reference</h3>
+                            <div class="ref-code-box">
+                                <pre><code id="model-solution-content"></code></pre>
+                            </div>
+                            <div class="complexity-row">
+                                <span id="complexity-badge" class="complexity-badge hidden"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checklist-section">
+                        <h3>Checklist</h3>
+                        <label class="chk-item"><input type="checkbox" id="chk-pytest"> Ran pytest locally</label>
+                        <label class="chk-item"><input type="checkbox" id="chk-push"> Pushed to GitHub</label>
+                        <label class="chk-item"><input type="checkbox" id="chk-pass"> Tests passed on Actions</label>
+                    </div>
+
+                    <div class="done-row">
+                        <button id="mark-done-btn" class="save-btn">Mark as completed &#x2714;</button>
+                        <span id="save-status" class="status-msg"></span>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
