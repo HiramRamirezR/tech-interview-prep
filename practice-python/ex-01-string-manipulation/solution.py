@@ -6,5 +6,3 @@ def camel_to_snake(input):
         result += char.lower()
     
     return result
-
-camel_to_snake("HolaMundo")
