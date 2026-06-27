@@ -1,5 +1,6 @@
 # Python
 __pycache__/
+.pytest_cache/
 *.py[cod]
 *$py.class
 *.so
@@ -9,3 +10,9 @@ ENV/
 
 # VS Code
 .vscode/
+
+# Speech Coach
+.env
+node_modules/
+# Local Netlify folder
+.netlify

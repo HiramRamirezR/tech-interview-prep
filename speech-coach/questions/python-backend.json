@@ -1,0 +1,110 @@
+[
+  {
+    "id": "py-be-001",
+    "question": "Explica la diferencia entre una lista y una tupla en Python.",
+    "track": "Python Backend",
+    "difficulty": "junior",
+    "type": "technical",
+    "tags": ["python", "data-structures"],
+    "modelAnswer": "Las listas son mutables (se pueden modificar después de creadas), mientras que las tuplas son inmutables. Las listas usan sintaxis de corchetes [] y las tuplas paréntesis (). Las tuplas son más rápidas y pueden usarse como claves de diccionario por ser hashables."
+  },
+  {
+    "id": "py-be-002",
+    "question": "¿Cómo funciona el GIL (Global Interpreter Lock) en Python y cómo afecta la concurrencia?",
+    "track": "Python Backend",
+    "difficulty": "mid",
+    "type": "technical",
+    "tags": ["python", "concurrency", "gil"],
+    "modelAnswer": "El GIL es un mutex que protege el acceso a objetos de Python, permitiendo que solo un hilo ejecute bytecode a la vez. Esto limita el paralelismo real en CPython para tareas CPU-bound. Para I/O-bound, threading sigue siendo útil. Para CPU-bound, se recomienda multiprocessing o asyncio."
+  },
+  {
+    "id": "py-be-003",
+    "question": "Describe cómo implementarías una API REST con FastAPI. ¿Qué ventajas tiene sobre Flask?",
+    "track": "Python Backend",
+    "difficulty": "mid",
+    "type": "technical",
+    "tags": ["fastapi", "rest", "api"],
+    "modelAnswer": "FastAPI ofrece validación automática con Pydantic, documentación OpenAPI interactiva, rendimiento cercano a Node/Go gracias a Starlette, y tipado nativo de Python. Flask es más minimalista pero requiere más configuración para validación, serialización y documentación."
+  },
+  {
+    "id": "py-be-004",
+    "question": "¿Qué es SQLAlchemy y cómo manejas las sesiones en una aplicación web?",
+    "track": "Python Backend",
+    "difficulty": "mid",
+    "type": "technical",
+    "tags": ["sqlalchemy", "database", "orm"],
+    "modelAnswer": "SQLAlchemy es un ORM que mapea clases de Python a tablas de base de datos. Las sesiones se manejan con SessionLocal, creando una por request (dependencia en FastAPI), haciendo commit al finalizar y cerrando en finally. Se usa context manager o middleware para asegurar el cleanup."
+  },
+  {
+    "id": "py-be-005",
+    "question": "Explica la diferencia entre@staticmethod y @classmethod en Python.",
+    "track": "Python Backend",
+    "difficulty": "junior",
+    "type": "technical",
+    "tags": ["python", "oop"],
+    "modelAnswer": "@staticmethod no recibe la clase ni la instancia implícitamente, funciona como una función normal dentro de la clase. @classmethod recibe la clase (cls) como primer argumento y puede modificar el estado de la clase. @classmethod se usa típicamente para factory methods."
+  },
+  {
+    "id": "py-be-006",
+    "question": "¿Cómo manejas la autenticación y autorización en una API?",
+    "track": "Python Backend",
+    "difficulty": "mid",
+    "type": "technical",
+    "tags": ["security", "auth", "jwt"],
+    "modelAnswer": "Se usa JWT (JSON Web Tokens): el usuario hace login con credenciales, recibe un token firmado, y lo envía en el header Authorization. El servidor verifica la firma y extrae los claims. Para autorización, se verifican roles/permisos del usuario en cada endpoint protegido."
+  },
+  {
+    "id": "py-be-007",
+    "question": "Cuéntame sobre un proyecto desafiante en el que hayas trabajado. ¿Cuál fue tu rol y cómo resolviste los problemas?",
+    "track": "Python Backend",
+    "difficulty": "mid",
+    "type": "behavioral",
+    "tags": ["experience", "problem-solving"],
+    "modelAnswer": null
+  },
+  {
+    "id": "py-be-008",
+    "question": "¿Cómo manejas el rate limiting en una API?",
+    "track": "Python Backend",
+    "difficulty": "senior",
+    "type": "technical",
+    "tags": ["api", "rate-limiting", "scalability"],
+    "modelAnswer": "Se puede implementar con Redis usando ventanas deslizantes (sliding window) o token bucket. Cada request incrementa un contador por IP o usuario en Redis con TTL. Cuando se excede el límite, se devuelve 429 Too Many Requests con headers de rate limit."
+  },
+  {
+    "id": "py-be-009",
+    "question": "¿Qué estrategias usas para testing en Python?",
+    "track": "Python Backend",
+    "difficulty": "mid",
+    "type": "technical",
+    "tags": ["testing", "pytest", "tdd"],
+    "modelAnswer": "Uso pytest con fixtures para setup/teardown, pytest-cov para cobertura, y pytest-mock para mocking. Para APIs, uso TestClient de FastAPI. Sigo la pirámide de testing: muchos unit tests, menos integration tests, pocos e2e. Uso factory_boy para generar datos de prueba."
+  },
+  {
+    "id": "py-be-010",
+    "question": "Explica el patrón Repository y por qué es útil en backend.",
+    "track": "Python Backend",
+    "difficulty": "senior",
+    "type": "technical",
+    "tags": ["design-patterns", "architecture"],
+    "modelAnswer": "El patrón Repository abstrae la capa de persistencia, permitiendo cambiar la fuente de datos sin afectar la lógica de negocio. Separa la lógica de acceso a datos de la lógica de negocio. Facilita el testing al poder mockear repositorios. Se usa con Unit of Work para transacciones."
+  },
+  {
+    "id": "py-be-011",
+    "question": "¿Cómo diseñarías un sistema para manejar webhooks a gran escala?",
+    "track": "Python Backend",
+    "difficulty": "senior",
+    "type": "technical",
+    "tags": ["webhooks", "architecture", "scalability"],
+    "modelAnswer": "Usaría una cola de mensajes (RabbitMQ, Redis Streams) para desacoplar la recepción del envío. Workers procesan los eventos y los envían con reintentos exponenciales. Almaceno el estado del delivery en DB. Uso firmas HMAC para verificar la autenticidad. Implemento circuit breaker para clientes lentos."
+  },
+  {
+    "id": "py-be-012",
+    "question": "¿Por qué quieres trabajar en esta empresa?",
+    "track": "Python Backend",
+    "difficulty": "junior",
+    "type": "behavioral",
+    "tags": ["motivation", "culture-fit"],
+    "modelAnswer": null
+  }
+]

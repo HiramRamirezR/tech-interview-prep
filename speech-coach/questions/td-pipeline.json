@@ -1,0 +1,110 @@
+[
+  {
+    "id": "td-001",
+    "question": "Explica el pipeline de producción en un estudio de VFX o animación. ¿Cuál es el rol de un TD Pipeline?",
+    "track": "TD Pipeline",
+    "difficulty": "junior",
+    "type": "technical",
+    "tags": ["pipeline", "vfx", "production"],
+    "modelAnswer": "El pipeline cubre desde la entrada de assets hasta el render final: modeling, rigging, shading, layout, animation, lighting, rendering, compositing. El TD Pipeline desarrolla y mantiene las herramientas que conectan estas etapas, automatiza flujos de trabajo, y asegura que los datos fluyan correctamente entre departamentos."
+  },
+  {
+    "id": "td-002",
+    "question": "¿Qué es un DCC y cómo interactúas con él desde Python?",
+    "track": "TD Pipeline",
+    "difficulty": "junior",
+    "type": "technical",
+    "tags": ["dcc", "python", "api"],
+    "modelAnswer": "DCC son Digital Content Creation tools (Maya, Houdini, Nuke, Blender). Se interactúa mediante sus APIs de Python: pymel/cmds en Maya, hou en Houdini, nuke en Nuke. Se pueden escribir scripts, crear tools con UI, y automatizar procesos batch headless."
+  },
+  {
+    "id": "td-003",
+    "question": "¿Cómo manejarías la gestión de versiones de assets en un pipeline?",
+    "track": "TD Pipeline",
+    "difficulty": "mid",
+    "type": "technical",
+    "tags": ["asset-management", "versioning", "pipeline"],
+    "modelAnswer": "Implementaría un sistema de versionado tipo MAJOR.MINOR.PATCH. Cada save crea una nueva versión del archivo sin sobrescribir. Uso una convención de naming como assetName_v001.ma. Almaceno metadatos (autor, fecha, nota) en un archivo .json sidecar o en una base de datos. Integro con ShotGrid/Ftrack para tracking."
+  },
+  {
+    "id": "td-004",
+    "question": "Explica cómo automatizarías la exportación de assets de Maya a un motor de render como Unreal o Unity.",
+    "track": "TD Pipeline",
+    "difficulty": "mid",
+    "type": "technical",
+    "tags": ["maya", "export", "unreal", "automation"],
+    "modelAnswer": "Usaría PyMel para abrir el archivo de Maya, validar el asset (naming, transformaciones, limpieza de historia), exportar a FBX o Alembic con convenciones específicas, y luego usar el Python API del motor (UnrealEditorPython) para importar con las settings correctas. Pipeline step intermedio con validación automática."
+  },
+  {
+    "id": "td-005",
+    "question": "¿Qué experiencia tienes con sistemas de control de versiones para archivos binarios grandes?",
+    "track": "TD Pipeline",
+    "difficulty": "mid",
+    "type": "technical",
+    "tags": ["version-control", "binary", "perforce"],
+    "modelAnswer": "Perforce es el estándar en VFX por su manejo eficiente de archivos binarios grandes. Ofrece locking (check-out/check-in) para evitar conflictos. Git LFS es alternativa pero menos común en estudios grandes. Es importante tener buen branching estrategia y shelving para WIP."
+  },
+  {
+    "id": "td-006",
+    "question": "¿Cómo diseñarías un sistema de publishing que no interrumpa el flujo de trabajo de los artistas?",
+    "track": "TD Pipeline",
+    "difficulty": "senior",
+    "type": "technical",
+    "tags": ["publishing", "workflow", "pipeline-design"],
+    "modelAnswer": "El publishing debe ser asíncrono y no bloqueante. El artista inicia el publish desde el DCC, el sistema valida el asset, sube los archivos a un servidor central, actualiza la base de datos, y dispara eventos para downstream departments. Notificaciones por Slack/Teams. Rollback fácil si algo sale mal."
+  },
+  {
+    "id": "td-007",
+    "question": "Describe un caso donde tuviste que debuggear un problema complejo en el pipeline. ¿Cómo lo resolviste?",
+    "track": "TD Pipeline",
+    "difficulty": "mid",
+    "type": "behavioral",
+    "tags": ["debugging", "problem-solving"],
+    "modelAnswer": null
+  },
+  {
+    "id": "td-008",
+    "question": "¿Qué es USD (Universal Scene Description) y por qué es importante en pipelines modernos?",
+    "track": "TD Pipeline",
+    "difficulty": "mid",
+    "type": "technical",
+    "tags": ["usd", "pixar", "scene-description"],
+    "modelAnswer": "USD es un framework de Pixar para describir, composicionar y versionar escenas 3D. Permite no-destructive layering, referencias entre archivos, y escalado a escenas masivas. Es el estándar emergente en pipelines modernos por su flexibilidad y rendimiento. Sustituye formatos propietarios."
+  },
+  {
+    "id": "td-009",
+    "question": "Explica cómo integrarías un render farm (Deadline/Thinkbox) con el pipeline del estudio.",
+    "track": "TD Pipeline",
+    "difficulty": "senior",
+    "type": "technical",
+    "tags": ["render-farm", "deadline", "automation"],
+    "modelAnswer": "Crearía scripts que preparan la escena para render (setear frames, resolución, capas de render), envían el job a Deadline con dependencias, monitorean el progreso via API, y notifican al usuario al completar. Los paths deben ser relativos para funcionar en cualquier nodo del farm."
+  },
+  {
+    "id": "td-010",
+    "question": "¿Cómo manejarías la migración de un pipeline de Python 2 a Python 3?",
+    "track": "TD Pipeline",
+    "difficulty": "senior",
+    "type": "technical",
+    "tags": ["python", "migration", "pipeline"],
+    "modelAnswer": "Usaría 2to3 y modernize para conversión automática inicial, luego testing exhaustivo. Los DCCs deben estar en versiones que soporten Python 3. Estrategia: correr ambos en paralelo durante transición, actualizar los tool wrapper layers primero, y los DCC-specific scripts después."
+  },
+  {
+    "id": "td-011",
+    "question": "¿Qué sistema de base de datos usarías para un pipeline y por qué?",
+    "track": "TD Pipeline",
+    "difficulty": "mid",
+    "type": "technical",
+    "tags": ["database", "pipeline", "shotgrid"],
+    "modelAnswer": "ShotGrid/Ftrack como capa de producción (seguimiento de tareas, versiones). PostgreSQL o MySQL para datos internos del pipeline (asset registry, dependencias). Redis para caché y colas. MongoDB es útil para metadatos flexibles. La clave es la integración entre el tracking y el pipeline técnico."
+  },
+  {
+    "id": "td-012",
+    "question": "¿Por qué te interesa el rol de TD Pipeline y cómo ves tu desarrollo en esta área?",
+    "track": "TD Pipeline",
+    "difficulty": "junior",
+    "type": "behavioral",
+    "tags": ["motivation", "career"],
+    "modelAnswer": null
+  }
+]

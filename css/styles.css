@@ -28,6 +28,30 @@ body {
     flex-direction: column;
 }
 
+.nav-bar {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.nav-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.nav-link:hover {
+    background: #3e3e42;
+    color: var(--text-main);
+}
+
+.nav-link.active {
+    color: var(--success);
+    background: #2d2d30;
+}
+
 header {
     background-color: #333333;
     padding: 1rem 2rem;
@@ -36,12 +60,6 @@ header {
     align-items: center;
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
-}
-
-.logo {
-    font-weight: 700;
-    font-size: 1.2rem;
-    color: var(--success);
 }
 
 .header-right {

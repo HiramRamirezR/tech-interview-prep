@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speech Coach — Interview Practice</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="app">
+    <nav class="nav-bar">
+      <a href="../index.html" class="nav-link">💻 Coding Practice</a>
+      <a href="index.html" class="nav-link active">🎤 Speech Coach</a>
+    </nav>
+    <header class="app-header">
+      <h1>Speech Coach</h1>
+      <p class="subtitle">Practica tus entrevistas técnicas con IA</p>
+    </header>
+
+    <main class="app-main">
+      <!-- Config -->
+      <section class="config-panel" id="configPanel">
+        <div class="config-group">
+          <label for="trackSelect">Track</label>
+          <select id="trackSelect">
+            <option value="Python Backend">Python Backend</option>
+            <option value="TD Pipeline">TD Pipeline</option>
+          </select>
+        </div>
+
+        <div class="config-group">
+          <label for="modeSelect">Modo</label>
+          <select id="modeSelect">
+            <option value="practice">Práctica libre</option>
+            <option value="simulation">Simulación</option>
+          </select>
+        </div>
+
+        <div class="config-actions">
+          <button id="newQuestionBtn" class="btn btn-primary">Nueva pregunta</button>
+          <button id="coachSessionBtn" class="btn btn-secondary">Prepárame una sesión</button>
+        </div>
+      </section>
+
+      <!-- Question -->
+      <section class="question-panel" id="questionPanel">
+        <div class="question-header">
+          <span class="badge" id="difficultyBadge"></span>
+          <span class="badge" id="typeBadge"></span>
+          <span class="tags" id="tagsContainer"></span>
+        </div>
+        <p class="question-text" id="questionText">
+          Selecciona un track y haz clic en "Nueva pregunta" para comenzar.
+        </p>
+      </section>
+
+      <!-- Recorder -->
+      <section class="recorder-panel" id="recorderPanel">
+        <div class="recorder-controls">
+          <button id="recordBtn" class="btn btn-record" disabled>
+            <span class="record-icon">🎤</span>
+            <span id="recordBtnText">Grabar respuesta</span>
+          </button>
+          <span id="recordingStatus" class="recording-status"></span>
+        </div>
+
+        <div class="transcript-area">
+          <label for="transcript">Tu respuesta:</label>
+          <textarea id="transcript" rows="6" placeholder="La transcripción aparecerá aquí mientras hablas..." readonly></textarea>
+        </div>
+
+        <div class="response-actions">
+          <button id="clearBtn" class="btn btn-secondary" disabled>Limpiar respuesta</button>
+          <button id="gradeBtn" class="btn btn-primary" disabled>Calificar respuesta</button>
+        </div>
+      </section>
+
+      <!-- Timer (simulation mode) -->
+      <section class="timer-panel" id="timerPanel" style="display:none;">
+        <div class="timer-display">
+          <span id="timerLabel">Tiempo de pensamiento</span>
+          <span id="timerValue">00:00</span>
+        </div>
+        <div class="timer-controls">
+          <button id="startTimerBtn" class="btn btn-small">Iniciar</button>
+        </div>
+      </section>
+
+      <!-- Result -->
+      <section class="result-panel" id="resultPanel" style="display:none;">
+        <div class="result-header">
+          <h2>Resultado</h2>
+          <span class="score" id="scoreDisplay">0</span>
+        </div>
+        <div class="result-body">
+          <div class="result-section">
+            <h3>Feedback</h3>
+            <p id="feedbackText"></p>
+          </div>
+          <div class="result-section">
+            <h3>Fortalezas</h3>
+            <ul id="strengthsList"></ul>
+          </div>
+          <div class="result-section">
+            <h3>Áreas a mejorar</h3>
+            <ul id="improvementsList"></ul>
+          </div>
+          <div class="result-section" id="modelAnswerSection" style="display:none;">
+            <h3>Respuesta modelo</h3>
+            <p id="modelAnswerText"></p>
+          </div>
+        </div>
+        <button id="nextFromResultBtn" class="btn btn-primary">Siguiente pregunta</button>
+      </section>
+
+      <!-- Chat -->
+      <section class="chat-panel" id="chatPanel" style="display:none;">
+        <h2>Chatea con la IA</h2>
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-msg assistant">
+            ¿Algo que no haya quedado claro? Pregúntame sobre la evaluación o la respuesta modelo.
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <input type="text" id="chatInput" placeholder="Haz una pregunta..." />
+          <button id="chatSendBtn" class="btn btn-primary">Enviar</button>
+        </div>
+      </section>
+
+      <!-- History -->
+      <section class="history-panel" id="historyPanel">
+        <h2>Historial</h2>
+        <div class="stats-row" id="statsRow">
+          <div class="stat-card">
+            <span class="stat-value" id="sessionsToday">0</span>
+            <span class="stat-label">Hoy</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="streakCount">0</span>
+            <span class="stat-label">Racha</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="avgScore">-</span>
+            <span class="stat-label">Promedio</span>
+          </div>
+        </div>
+        <div class="history-list" id="historyList"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/questions.js"></script>
+  <script src="js/recorder.js"></script>
+  <script src="js/grader.js"></script>
+  <script src="js/history.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
