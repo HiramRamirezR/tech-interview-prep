@@ -67,6 +67,11 @@ const AppState = {
     localStorage.setItem(this._key('tickets_date'), this._todayStr());
   },
 
+  clearTicketsForToday() {
+    localStorage.removeItem(this._key('tickets'));
+    localStorage.removeItem(this._key('tickets_date'));
+  },
+
   markTicketCompleted(ticketId) {
     localStorage.setItem(this._key('tkt_done_' + ticketId), 'true');
   },

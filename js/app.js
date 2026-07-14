@@ -156,6 +156,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('show-reference-btn').addEventListener('click', revealReference);
   document.getElementById('mark-done-btn').addEventListener('click', markDone);
 
+  document.getElementById('regen-btn').addEventListener('click', () => {
+    AppState.clearTicketsForToday();
+    showDashboard();
+  });
+
   document.getElementById('reset-btn').addEventListener('click', () => {
     if (confirm('Reset all progress? This cannot be undone.')) {
       AppState.resetAll();

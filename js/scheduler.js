@@ -1,7 +1,7 @@
 const Scheduler = {
   _isWorkDay(date) {
     const day = date.getDay();
-    return day >= 1 && day <= 5;
+    return day >= 1 && day <= 6;
   },
 
   _workDaysBetween(d1, d2) {
